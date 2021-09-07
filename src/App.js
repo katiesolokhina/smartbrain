@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import React, { Component } from "react";
+=======
+import React from "react";
+import Particles from "react-particles-js";
+>>>>>>> f9fc2e4f021b473417f2b57baa57cc4dcfd056ee
 import Navigation from "./components/Navigation/Navigation";
 import Clarifai from "clarifai";
 import Logo from "./components/Logo/Logo";
@@ -7,6 +12,7 @@ import ImageLinkForm from "./components/ImageLinkForm/ImageLinkForm";
 import FaceRecognition from "./components/FaceRecognition/FaceRecognition";
 import "./App.css";
 
+<<<<<<< HEAD
 const app = new Clarifai.App({
   apiKey: "92d958e8025d4d749c3e4ee2c5923c59",
 });
@@ -67,6 +73,33 @@ class App extends Component {
       </div>
     );
   }
+=======
+const particlesOptions = {
+  particles: {
+    number: {
+      value: 150,
+      density: {
+        enable: true,
+        value_area: 800,
+      },
+    },
+  },
+};
+
+function App() {
+  return (
+    <div className="App">
+      <Particles className="particles" params={particlesOptions} />
+      <Navigation />
+      <Logo />
+      <Rank />
+      <ImageLinkForm />
+      {
+        //<FaceRecognition/>
+      }
+    </div>
+  );
+>>>>>>> f9fc2e4f021b473417f2b57baa57cc4dcfd056ee
 }
 
 export default App;
