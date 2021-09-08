@@ -32,29 +32,41 @@ class App extends Component {
     this.state = {
       input: "",
       imageUrl: "",
-      box: {},
+      celebrity: "",
+      celebrityLikeliness: "",
+      box: [],
       route: "signin",
       isSignedIn: false,
     };
   }
 
   calculateFaceLocation = (data) => {
-    const clarifaiFace =
-      data.outputs[0].data.regions[0].region_info.bounding_box;
+    const facesDetected = data.outputs[0].data.regions;
     const image = document.getElementById("inputImage");
     const width = Number(image.width);
     const height = Number(image.height);
-    console.log(width, height);
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - clarifaiFace.right_col * width,
-      bottomRow: height - clarifaiFace.bottom_row * height,
-    };
+    const box = [];
+
+    facesDetected.forEach((region) => {
+      const celebrityLikeliness = region.data.concepts[0].value;
+      const celebrityFace =
+        "There is a " +
+        Math.round(celebrityLikeliness * 100) +
+        "% chance that this is " +
+        region.data.concepts[0].name;
+
+      box.push({
+        celebrity: celebrityFace,
+        leftCol: region.region_info.bounding_box.left_col * width,
+        topRow: region.region_info.bounding_box.top_row * height,
+        rightCol: width - region.region_info.bounding_box.right_col * width,
+        bottomRow: height - region.region_info.bounding_box.bottom_row * height,
+      });
+    });
+    return box;
   };
 
   displayFaceBox = (box) => {
-    console.log(box);
     this.setState({ box: box });
   };
 
@@ -65,7 +77,7 @@ class App extends Component {
   onButtonSubmit = () => {
     this.setState({ imageUrl: this.state.input });
     app.models
-      .predict(Clarifai.FACE_DETECT_MODEL, this.state.input)
+      .predict(Clarifai.CELEBRITY_MODEL, this.state.input) //changed from face_detect_model or celebrity_model
       .then((response) =>
         this.displayFaceBox(this.calculateFaceLocation(response))
       )
@@ -86,7 +98,10 @@ class App extends Component {
     return (
       <div className="App">
         <Particles className="particles" params={particlesOptions} />
-        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        <Navigation
+          isSignedIn={isSignedIn}
+          onRouteChange={this.onRouteChange}
+        />
         {route === "home" ? (
           <div>
             <Logo />
@@ -95,10 +110,7 @@ class App extends Component {
               onInputChange={this.onInputChange}
               onButtonSubmit={this.onButtonSubmit}
             />
-            <FaceRecognition
-              box={box}
-              imageUrl={imageUrl}
-            />
+            <FaceRecognition box={box} imageUrl={imageUrl} />
           </div>
         ) : route === "signin" ? (
           <Signin onRouteChange={this.onRouteChange} />
